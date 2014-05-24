@@ -8,9 +8,11 @@ bus = smbus.SMBus(1)
 address = 0x04
 
 def writeNumber(value):
-    bus.write_byte(address, value)
-    # bus.write_byte_data(address, 0, value)
-    return -1
+    try:
+        bus.write_byte(address, value)
+    except IOError:
+        return False
+    return True
 
 def readNumber():
     number = bus.read_byte(address)
@@ -27,13 +29,11 @@ if __name__ == "__main__":
         if char not in ['j', 'k']:
             continue
 
-        if char == 'k':
-            writeNumber(2)  # move forward
-            print 'Moving forward'
-            time.sleep(1)
-            writeNumber(1)  # stop
+        number = 2 if char == 'k' else 0
+        if not writeNumber(number):
+            print 'cannot write number'
+            continue
         else:
-            writeNumber(0)  # move forward
-            print 'Reversing'
+            print 'moving'
             time.sleep(1)
             writeNumber(1)  # stop
