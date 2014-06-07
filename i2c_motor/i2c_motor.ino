@@ -1,4 +1,7 @@
-// Controls the motors of the Ardupi
+// Controls the motors of TOHKATSU over i2c
+
+#include <Wire.h>
+#define SLAVE_ADDRESS 0x04
 
 const int pwmA = 3;
 const int brakeA = 9;
@@ -39,9 +42,16 @@ DC_motor motorA(brakeA, dirA, pwmA);
 DC_motor motorB(brakeB, dirB, pwmB);
   
 void setup() {
+
+  Serial.begin(9600);
   motorA.setup();
   motorB.setup();
-  Serial.begin(9600);
+
+    // initialize i2c as slave
+    Wire.begin(SLAVE_ADDRESS);
+
+    // define callbacks for i2c communication
+    Wire.onReceive(receiveData);
 }
 
 void loop(){
