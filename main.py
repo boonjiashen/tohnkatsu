@@ -17,15 +17,30 @@ def readNumber():
     return number
 
 while True:
-    digit = input("Enter 0 - 9: ")
-    if type(digit) is not int or digit / 10 != 0:
+
+    # Receive user input
+    digit = input("Enter 0 - 8: ")
+    if type(digit) is not int or digit not in range(9):
         continue
 
+    # Send command to Arduino
     writeNumber(digit)
-    print "RPI: Hi Arduino, I sent you ", digit
-    # sleep one second
-    time.sleep(1)
 
-#    number = readNumber()
-#    print "Arduino: Hey RPI, I received a digit ", number
-#    print
+    # Print status
+    print "RPI: Hi Arduino, I sent you ", digit
+    def base_3_digit_to_char(digit):
+        assert digit in [0, 1, 2]
+        if digit == 0:
+            return 'v'  # moving backwards
+        elif digit == 1:
+            return '-'  # staying still
+        else:
+            return '^'  # moving forward
+    left_motor_digit = digit / 3
+    right_motor_digit = digit % 3
+    print 'Left motor: %c | right motor: %c' %  \
+            (base_3_digit_to_char(left_motor_digit),  \
+            base_3_digit_to_char(right_motor_digit))
+
+    # Sleep one second
+    time.sleep(1)

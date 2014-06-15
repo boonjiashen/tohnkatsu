@@ -56,12 +56,7 @@ void setup() {
 
 void loop(){
 
-  motorA.set_speed(1.0);
-  motorB.set_speed(1.0);
-  delay(3000);
-  motorA.set_speed(-1.0);
-  motorB.set_speed(-1.0);
-  delay(2000);
+  delay(100);
 }
 
 /*
