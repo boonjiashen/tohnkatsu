@@ -16,19 +16,39 @@ def readNumber():
     # number = bus.read_byte_data(address, 1)
     return number
 
+"""
+Instructions:
+------------------
+Press Q/A/Z for left motor to go forward/stop/backwards
+Press W/S/X for right motor to go forward/stop/backwards
+"""
+lmotor_state, rmotor_state = 1, 1
+import Getch
+getch = Getch._Getch()
+print "Enter Q/A/Z/W/S/X to control motors (or ESC to escape):"
 while True:
 
     # Receive user input
-    digit = input("Enter 0 - 8: ")
-    if type(digit) is not int or digit not in range(9):
+    keystroke = getch().upper()
+    esc = '\x1b'
+    if keystroke == esc:
+        digit_to_kill_motors = 4
+        writeNumber(digit_to_kill_motors)
+        break
+
+    # Parse user input
+    if keystroke not in 'QAZWSX': 
         continue
+    if 'ZAQ'.find(keystroke) != -1:
+        lmotor_state = 'ZAQ'.find(keystroke)
+    if 'XSW'.find(keystroke) != -1:
+        rmotor_state = 'XSW'.find(keystroke)
+    digit = lmotor_state * 3 + rmotor_state
 
     # Send command to Arduino
     writeNumber(digit)
 
-    # Print status
-    print "RPI: Hi Arduino, I sent you ", digit
-    def base_3_digit_to_char(digit):
+    def base_3_digit_to_keystroke(digit):
         assert digit in [0, 1, 2]
         if digit == 0:
             return 'v'  # moving backwards
@@ -36,11 +56,11 @@ while True:
             return '-'  # staying still
         else:
             return '^'  # moving forward
-    left_motor_digit = digit / 3
-    right_motor_digit = digit % 3
+    # Print status
+    print "RPI: read keystroke %c, send Arduino %i " % (keystroke, digit)
     print 'Left motor: %c | right motor: %c' %  \
-            (base_3_digit_to_char(left_motor_digit),  \
-            base_3_digit_to_char(right_motor_digit))
+            (base_3_digit_to_keystroke(lmotor_state),  \
+            base_3_digit_to_keystroke(rmotor_state))
 
     # Sleep one second
-    time.sleep(1)
+    time.sleep(.01)
